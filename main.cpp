@@ -35,9 +35,12 @@ int main(int argv,char *argc[]){
     LineInput=fopen(argc[2],"r");
     PointInput=fopen(argc[3],"r");
 	LineOut=fopen(argc[4],"w");
-	/*read data from file*/
+	/*	read data from file
+		because the gml format is fixed, do not care what the text write
+		for each point, let grid to record this grid has which point and line
+	*/
 	while(fscanf(LineInput,"%s",input)!=EOF){	//read line
-		int id=atoi(input);
+		int id=atoi(input);	//get the id
 		while(fscanf(LineInput,"%s",input)!=EOF){	//ignore gml format and its text
 			if(input[0]=='"' && input[1]=='>'){
 				break;
@@ -57,7 +60,7 @@ int main(int argv,char *argc[]){
 		ptmp.removable=1;
 
 		while(fscanf(LineInput,"%s",input)!=EOF){	//other point in this line
-			if(input[0]=='<')	break;	//end of the point
+			if(input[0]=='<')	break;		//end of the point
 			ptmp.x=atof(input);
 			for(int i=0;input[i]!='\0';i++)
 				if(input[i]==','){
@@ -82,20 +85,24 @@ int main(int argv,char *argc[]){
 				ptmp.y=atof(input+i+1);
 				break;
 			}
+		//add this obstacle to this grid
 		grid[(int)(ptmp.x/100)*100][(int)(ptmp.y/100)*100].grid_point.push_back(ptmp);
+		while(fscanf(LineInput,"%s",input)!=EOF){	//read until to the gml end
+			if(input[0]=='<')	break;
+		}
 	}
     /*delete the point*/
     int line_size=line.size(),line_point_size;
     for(int i=0;i<line_size;i++){
     	int max_x,min_x,max_y,min_y,tmpx,tmpy;
     	line_point_size=line[i].lipoint.size();
-    	max_x=min_x=(int)(line[i].lipoint[0].x/100)*100;
+    	max_x=min_x=(int)(line[i].lipoint[0].x/100)*100;	//calculate which is start grid
     	max_y=min_y=(int)(line[i].lipoint[0].y/100)*100;
     	int no_other=1;
     	for(int j=0;i<line_point_size;j++){
-			tmpx=(int)(line[i].lipoint[j].x/100)*100;
+			tmpx=(int)(line[i].lipoint[j].x/100)*100;	//get the current point is in which grid
 			tmpy=(int)(line[i].lipoint[j].y/100)*100;
-			if(tmpx>max_x){
+			if(tmpx>max_x){	//check the new area whether has other object that may cause line and line cross
 				grid_node gtmp;
 				for(int k=min_y;k<=max_y;k++){
 					if(grid[tmpx][k].grid_point.size()>0 ||
