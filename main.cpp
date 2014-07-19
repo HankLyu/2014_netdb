@@ -16,6 +16,10 @@
 在刪除點時，沒有辦法有效的判斷此點是否該刪除
 對於在判斷此(大)區域時，無法判斷出是否有障礙點
 目前只考慮線與點的關係
+
+若要執行程式，須設定argv
+./main 100 lines_out.txt points_out.txt out.txt
+//刪除點下限，線，障礙點，輸出檔
 */
 #include <iostream>
 #include <cstdio>
