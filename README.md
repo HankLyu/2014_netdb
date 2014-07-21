@@ -7,8 +7,6 @@ line.txt point.txt 是我自己測的小測資
 
 2014/7/21
 更正點放格子的方式：
-
-因為座標有負的關係，所以此點的歸類需減一個grid_size
-
-Ex: (-1.23,0) grid_size=10
-則此點需放 gird[-10][0].grid_point
+	因為座標有負的關係，所以此點的歸類需減一個grid_size
+	Ex: (-1.23,0) grid_size=10
+	則此點需放 gird[-10][0].grid_point
