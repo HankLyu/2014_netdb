@@ -23,7 +23,6 @@
 #include <map>
 #include <cmath>
 #include <algorithm>
-#include <string>
 
 #define grid_size 1000
 
@@ -76,10 +75,10 @@ int main(int argc,char *argv[]){
 				break;
 			}
 		int tmpx,tmpy;
-		tmpx=((int)(ptmp.x/grid_size))*grid_size;
-		tmpy=((int)(ptmp.y/grid_size))*grid_size;
-		if(ptmp.x<0)	tmpx-=grid_size;
-		if(ptmp.y<0)	tmpy-=grid_size;
+		tmpx=((int)(ptmp.x/grid_size))*grid_size;	//calculate this point should be put
+		tmpy=((int)(ptmp.y/grid_size))*grid_size;	//into which grid
+		if(ptmp.x<0)	tmpx-=grid_size;			//ex(1003.123,231.11)->(1000,0)
+		if(ptmp.y<0)	tmpy-=grid_size;			//ex(0.312,-12.11)->(0,-1000)
 		grid[tmpx][tmpy].line_id[id]=1;
 		ltmp.lipoint.push_back(ptmp);
 		ptmp.removable=1;
@@ -92,8 +91,8 @@ int main(int argc,char *argv[]){
 					ptmp.y=atof(input+i+1);
 					break;
 				}
-			tmpx=((int)(ptmp.x/grid_size))*grid_size;
-			tmpy=((int)(ptmp.y/grid_size))*grid_size;
+			tmpx=((int)(ptmp.x/grid_size))*grid_size;	//calculate this point should be put
+			tmpy=((int)(ptmp.y/grid_size))*grid_size;	//into which grid
 			if(ptmp.x<0)	tmpx-=grid_size;
 			if(ptmp.y<0)	tmpy-=grid_size;
 			grid[tmpx][tmpy].line_id[id]=1;
@@ -116,20 +115,18 @@ int main(int argc,char *argv[]){
 			}
 		//add this obstacle to this grid
 		int tmpx,tmpy;
-		tmpx=((int)(ptmp.x/grid_size))*grid_size;
-		tmpy=((int)(ptmp.y/grid_size))*grid_size;
+		tmpx=((int)(ptmp.x/grid_size))*grid_size;	//calculate this point should be put
+		tmpy=((int)(ptmp.y/grid_size))*grid_size;	//into which grid
 		if(ptmp.x<0)	tmpx-=grid_size;
 		if(ptmp.y<0)	tmpy-=grid_size;
 		grid[tmpx][tmpy].grid_point.push_back(ptmp);
-		//printf("point is %lf %lf\n",ptmp.x,ptmp.y);
-		//printf("%d %d\n",(int)(ptmp.x/grid_size)*grid_size,(int)(ptmp.y/grid_size)*grid_size);
-		//printf("%d\n",grid[(int)(ptmp.x/grid_size)*grid_size][(int)(ptmp.y/grid_size)*grid_size].grid_point.size());
 		while(fscanf(PointInput,"%s",input)!=EOF){	//read until to the gml end
 			if(input[0]=='<')	break;
 		}
 	}
     /*delete the point*/
     int line_size=line.size(),line_point_size;
+    int remove_num=0;
     for(int i=0;i<line_size;i++){
     	int max_x,min_x,max_y,min_y,tmpx,tmpy;
     	line_point_size=line[i].lipoint.size();
@@ -138,72 +135,63 @@ int main(int argc,char *argv[]){
     	if(line[i].lipoint[0].x<0)	max_x=min_x=min_x-grid_size;
     	if(line[i].lipoint[0].y<0)	max_y=min_y=min_y-grid_size;
     	int no_other=1,start=0;
-    	ltmp.lipoint.clear();
+    	ltmp.lipoint.clear();	//clear ltmp
     	ltmp.id=line[i].id;
     	for(int j=0;j<line_point_size;j++){
-    		//printf("%.1lf %.1lf,,",line[i].lipoint[j].x,line[i].lipoint[j].y);
-    		//printf("%d %d %d %d\n",min_x,max_x,min_y,max_y);
 			tmpx=(int)(line[i].lipoint[j].x/grid_size)*grid_size;	//get the current point is in which grid
 			tmpy=(int)(line[i].lipoint[j].y/grid_size)*grid_size;
 			if(line[i].lipoint[j].x<0)	tmpx-=grid_size;
 			if(line[i].lipoint[j].y<0)	tmpy-=grid_size;
-			//printf("  %d %d\n",tmpx,tmpy);
 			if(tmpx>max_x){	//check the new area whether has other object that may cause line and line cross
 				for(int k=min_y;k<=max_y;k+=grid_size){
-					if(grid[tmpx][k].grid_point.size()>0 ){ /*}
-						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[j].id]==0)
-						|| grid[tmpx][k].line_id.size()>1){	*/
+					if(grid[tmpx][k].grid_point.size()>0	//if new grid has obstacle point
+						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[i].id]==0)
+						|| grid[tmpx][k].line_id.size()>1){	//has another line
 						no_other=0;
-						printf("have point\n");
 						break;
 					}
-					if(no_other)	max_x=tmpx;
+					if(no_other)	max_x=tmpx;	//if new area just has no other object, expend the area
 				}
 			}else if(tmpx<min_x){
 				for(int k=min_y;k<=max_y;k+=grid_size){
-					if(grid[tmpx][k].grid_point.size()>0 ){/*
-						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[j].id]==0)
-						|| grid[tmpx][k].line_id.size()>1){*/
+					if(grid[tmpx][k].grid_point.size()>0
+						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[i].id]==0)
+						|| grid[tmpx][k].line_id.size()>1){
 						no_other=0;
-						printf("have point\n");
 						break;
 					}
-					if(no_other)	min_x=tmpx;
+					if(no_other)	min_x=tmpx;	//if new area just has no other object, expend the area
 				}
 			}
 			if(tmpy>max_y){
 				for(int k=min_x;k<=max_x;k+=grid_size){
-					if(grid[k][tmpy].grid_point.size()>0 ){/*
-						||(grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[j].id]==0)
-						|| grid[k][tmpy].line_id.size()>1){*/
+					if(grid[k][tmpy].grid_point.size()>0
+						||(grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[i].id]==0)
+						|| grid[k][tmpy].line_id.size()>1){
 						no_other=0;
-						printf("have point\n");
 						break;
 					}
-					if(no_other)	max_y=tmpy;
+					if(no_other)	max_y=tmpy;	//if new area just has no other object, expend the area
 				}
 			}else if(tmpy<min_y){
 				for(int k=min_x;k<=max_x;k+=grid_size){
-					if(grid[k][tmpy].grid_point.size()>0 ){/*
-						|| (grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[j].id]==0)
-						|| grid[k][tmpy].line_id.size()>1){*/
+					if(grid[k][tmpy].grid_point.size()>0
+						|| (grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[i].id]==0)
+						|| grid[k][tmpy].line_id.size()>1){
 						no_other=0;
-						printf("have point\n");
 						break;
 					}
-					if(no_other)	min_y=tmpy;
+					if(no_other)	min_y=tmpy;	//if new area just has no other object, expend the area
 				}
 			}
 			if(min_x==max_x && min_y==max_y){	//the area just has "one" grid
-				if(grid[min_x][min_y].grid_point.size()>0 )/*
-					|| (grid[min_x][min_y].line_id.size()==1 && grid[min_x][min_y].line_id[line[j].id]==0)
-					|| grid[min_x][min_y].line_id.size()>1)*/
+				if(grid[min_x][min_y].grid_point.size()>0
+					|| (grid[min_x][min_y].line_id.size()==1 && grid[min_x][min_y].line_id[line[i].id]==0)
+					|| grid[min_x][min_y].line_id.size()>1)
 					no_other=0;
 			}
 			if(!no_other){	//do delete
-				int id=line[i].id;
-				if(start==j){	//if one grid have obstacle point or another line
-					printf("do2\n");
+				if(start==j){	//if this grid have obstacle point or another line
 					ptmp=line[i].lipoint[start];
 					ltmp.lipoint.push_back(ptmp);
 					start++;
@@ -217,7 +205,7 @@ int main(int argc,char *argv[]){
 					max_x=min_x=(int)(line[i].lipoint[start].x/grid_size)*grid_size;	//calculate which is start grid
 					max_y=min_y=(int)(line[i].lipoint[start].y/grid_size)*grid_size;
 				}else{	//if this big area have another line or obstacle point
-					printf("do\n");
+					remove_num+=j-start-2;
 					ptmp=line[i].lipoint[start];
 					ltmp.lipoint.push_back(ptmp);
 					ptmp=line[i].lipoint[j-1];
@@ -233,10 +221,12 @@ int main(int argc,char *argv[]){
 				ltmp.lipoint.push_back(ptmp);
 				ptmp=line[i].lipoint[j];
 				ltmp.lipoint.push_back(ptmp);
+				remove_num+=j-start-1;
 			}
     	}//for(int j=0;j<line_point_size;j++)
     	ans.push_back(ltmp);
     }
+    printf("the num of remove point is %d\n",remove_num);
     /*print ans */
     line_size=ans.size();
     for(int i=0;i<line_size;i++){
@@ -244,7 +234,7 @@ int main(int argc,char *argv[]){
 		fprintf(LineOut,"%d:<gml:LineString srsName=\"EPSG:54004\" xmlns:gml=\"http://www.opengis.net/gml\">",ans[i].id);
 		fprintf(LineOut,"<gml:coordinates decimal=\".\" cs=\",\" ts=\" \">");
 		for(int j=0;j<line_point_size;j++){
-			fprintf(LineOut,"%.1lf,%.1lf \n",ans[i].lipoint[j].x,ans[i].lipoint[j].y);
+			fprintf(LineOut,"%.7lf,%.7lf ",ans[i].lipoint[j].x,ans[i].lipoint[j].y);
 		}
 		fprintf(LineOut,"</gml:coordinates></gml:LineString>\n");
     }
