@@ -1,3 +1,5 @@
+
+
 line.txt point.txt 是我自己測的小測資
 
 目前設定上grid_size 為1000
@@ -6,6 +8,11 @@ line.txt point.txt 是我自己測的小測資
 
 目前碰到一個怪問題，若把gird_size (格子大小) 寫大一點如一千，
 則可以有效判斷此格子是否有其他的object，如果grid_size 寫10，則無法判斷
+
+2014/7/25
+新增只有輸出點的部分而沒有gml 格式
+anstext.txt 為只輸出答案點
+pointtext.txt 為只輸出障礙點的部分
 
 2014/7/22
 目前已可處理線與線之間的判斷
