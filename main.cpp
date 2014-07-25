@@ -44,6 +44,7 @@ struct grid_node{	//record this grid has which line and point
 int main(int argc,char *argv[]){
     int PointToRemove = atoi(argv[1]);
     FILE *LineInput,*PointInput,*LineOut;
+    FILE *AnsTest,*PointTest;
     char input[10000];
     map<double, map<double, grid_node> > grid;	//record each has how many line and point
     vector<Point> obstacle_point;	//record Point from pointinput
@@ -53,6 +54,8 @@ int main(int argc,char *argv[]){
     LineInput=fopen(argv[2],"r");
     PointInput=fopen(argv[3],"r");
 	LineOut=fopen(argv[4],"w");
+	AnsTest=fopen("anstest.txt","w");
+	PointTest=fopen("pointtest.txt","w");
 	/*
 	read data from file
 	because the gml format is fixed, do not care what the text write
@@ -120,6 +123,7 @@ int main(int argc,char *argv[]){
 		if(ptmp.x<0)	tmpx-=grid_size;
 		if(ptmp.y<0)	tmpy-=grid_size;
 		grid[tmpx][tmpy].grid_point.push_back(ptmp);
+		fprintf(PointTest,"%.7lf,%.7lf\n",ptmp.x,ptmp.y);
 		while(fscanf(PointInput,"%s",input)!=EOF){	//read until to the gml end
 			if(input[0]=='<')	break;
 		}
@@ -235,8 +239,10 @@ int main(int argc,char *argv[]){
 		fprintf(LineOut,"<gml:coordinates decimal=\".\" cs=\",\" ts=\" \">");
 		for(int j=0;j<line_point_size;j++){
 			fprintf(LineOut,"%.7lf,%.7lf ",ans[i].lipoint[j].x,ans[i].lipoint[j].y);
+			fprintf(AnsTest,"%.7lf,%.7lf ",ans[i].lipoint[j].x,ans[i].lipoint[j].y);
 		}
 		fprintf(LineOut,"</gml:coordinates></gml:LineString>\n");
+		fprintf(AnsTest,"\n");
     }
     fclose(LineInput);
     fclose(PointInput);
