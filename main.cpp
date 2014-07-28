@@ -44,19 +44,16 @@ struct muti_object{	//to record which grid has more lines or obstacle point
 	grid_node node;
 	int line_num,pos_x,pos_y;
 };
-bool muti_cmp(muti_object a,muti_object b){
-
-}
 
 int main(int argc,char *argv[]){
     int PointToRemove = atoi(argv[1]);
     FILE *LineInput,*PointInput,*LineOut;
     FILE *AnsTest,*PointTest,*LineTest;
     char input[10000];
-    map<double, map<double, grid_node> > grid;	//record each has how many line and point
-    vector<Point> obstacle_point;	//record Point from pointinput
+    map<int, map<int, grid_node> > grid;	//record each has how many line and point
+    //vector<Point> obstacle_point;	//record Point from pointinput
     vector<Line> line,ans;
-    vector<muti_object> muti;		//wait to delete
+    map<int, map<int,int> > mutiobj_grid;		//wait to delete
     muti_object mtmp;
     Point ptmp;
     Line ltmp;
@@ -160,46 +157,50 @@ int main(int argc,char *argv[]){
 			if(line[i].lipoint[j].x<0)	tmpx-=grid_size;
 			if(line[i].lipoint[j].y<0)	tmpy-=grid_size;
 			if(tmpx>max_x){	//check the new area whether has other object that may cause line and line cross
-				for(int k=min_y;k<=max_y;k+=grid_size){
-					if(grid[tmpx][k].grid_point.size()>0	//if new grid has obstacle point
-						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[i].id]==0)
-						|| grid[tmpx][k].line_id.size()>1){	//has another line
-						no_other=0;
-						break;
+				for(int m=max_x+grid_size; m<=tmpx && no_other; m+=grid_size)
+					for(int k=min_y;k<=max_y;k+=grid_size){
+						if(grid[m][k].grid_point.size()>0	//if new grid has obstacle point
+							|| (grid[m][k].line_id.size()==1 && grid[m][k].line_id[line[i].id]==0)
+							|| grid[m][k].line_id.size()>1){	//has another line
+							no_other=0;
+							break;
+						}
 					}
-					if(no_other)	max_x=tmpx;	//if new area just has no other object, expend the area
-				}
+				if(no_other)	max_x=tmpx;	//if new area just has no other object, expend the area
 			}else if(tmpx<min_x){
-				for(int k=min_y;k<=max_y;k+=grid_size){
-					if(grid[tmpx][k].grid_point.size()>0
-						|| (grid[tmpx][k].line_id.size()==1 && grid[tmpx][k].line_id[line[i].id]==0)
-						|| grid[tmpx][k].line_id.size()>1){
-						no_other=0;
-						break;
+				for(int m=min_x-grid_size; m>=tmpx && no_other; m-=grid_size)
+					for(int k=min_y;k<=max_y;k+=grid_size){
+						if(grid[m][k].grid_point.size()>0
+							|| (grid[m][k].line_id.size()==1 && grid[m][k].line_id[line[i].id]==0)
+							|| grid[m][k].line_id.size()>1){
+							no_other=0;
+							break;
+						}
 					}
-					if(no_other)	min_x=tmpx;	//if new area just has no other object, expend the area
-				}
+				if(no_other)	min_x=tmpx;	//if new area just has no other object, expend the area
 			}
 			if(tmpy>max_y){
-				for(int k=min_x;k<=max_x;k+=grid_size){
-					if(grid[k][tmpy].grid_point.size()>0
-						||(grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[i].id]==0)
-						|| grid[k][tmpy].line_id.size()>1){
-						no_other=0;
-						break;
+				for(int m=max_y+grid_size; m<=tmpy && no_other; m+=grid_size)
+					for(int k=min_x;k<=max_x;k+=grid_size){
+						if(grid[k][m].grid_point.size()>0
+							||(grid[k][m].line_id.size()==1 && grid[k][m].line_id[line[i].id]==0)
+							|| grid[k][m].line_id.size()>1){
+							no_other=0;
+							break;
+						}
 					}
-					if(no_other)	max_y=tmpy;	//if new area just has no other object, expend the area
-				}
+				if(no_other)	max_y=tmpy;	//if new area just has no other object, expend the area
 			}else if(tmpy<min_y){
-				for(int k=min_x;k<=max_x;k+=grid_size){
-					if(grid[k][tmpy].grid_point.size()>0
-						|| (grid[k][tmpy].line_id.size()==1 && grid[k][tmpy].line_id[line[i].id]==0)
-						|| grid[k][tmpy].line_id.size()>1){
-						no_other=0;
-						break;
+				for(int m=min_y-grid_size; m>=tmpy && no_other; m-=grid_size)
+					for(int k=min_x;k<=max_x;k+=grid_size){
+						if(grid[k][m].grid_point.size()>0
+							|| (grid[k][m].line_id.size()==1 && grid[k][m].line_id[line[i].id]==0)
+							|| grid[k][m].line_id.size()>1){
+							no_other=0;
+							break;
+						}
 					}
-					if(no_other)	min_y=tmpy;	//if new area just has no other object, expend the area
-				}
+				if(no_other)	min_y=tmpy;	//if new area just has no other object, expend the area
 			}
 			if(min_x==max_x && min_y==max_y){	//the area just has "one" grid
 				if(grid[min_x][min_y].grid_point.size()>0
@@ -209,14 +210,7 @@ int main(int argc,char *argv[]){
 			}
 			if(!no_other){	//do delete
 				if(start==j){	//if this grid have obstacle point or another line
-					if(muti.size()==0||
-						tmpx!=muti[muti.size()-1].pos_x || tmpy!=muti[muti.size()-1].pos_y){
-						mtmp.node=grid[tmpx][tmpy];
-						mtmp.line_num=grid[tmpx][tmpy].line_id.size();
-						mtmp.pos_x=tmpx;
-						mtmp.pos_y=tmpy;
-						muti.push_back(mtmp);
-					}
+					mutiobj_grid[tmpx][tmpy]=1;
 					ptmp=line[i].lipoint[start];
 					ltmp.lipoint.push_back(ptmp);
 					start++;
