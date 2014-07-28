@@ -1,5 +1,15 @@
+# Sigspactial 2014
 
+## Document
+install requirements.txt
 
+    pip intall -r requirements.txt
+
+start drawing
+
+    python draw.py
+
+## Note
 line.txt point.txt 是我自己測的小測資
 
 目前設定上grid_size 為1000
