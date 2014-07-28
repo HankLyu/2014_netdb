@@ -40,15 +40,24 @@ struct grid_node{	//record this grid has which line and point
 	map<int,int>line_id;	//line -> record this line id
 	vector<Point> grid_point;	//point ->record this obstacle's x and y
 };
+struct muti_object{	//to record which grid has more lines or obstacle point
+	grid_node node;
+	int line_num,pos_x,pos_y;
+};
+bool muti_cmp(muti_object a,muti_object b){
+
+}
 
 int main(int argc,char *argv[]){
     int PointToRemove = atoi(argv[1]);
     FILE *LineInput,*PointInput,*LineOut;
-    FILE *AnsTest,*PointTest;
+    FILE *AnsTest,*PointTest,*LineTest;
     char input[10000];
     map<double, map<double, grid_node> > grid;	//record each has how many line and point
     vector<Point> obstacle_point;	//record Point from pointinput
     vector<Line> line,ans;
+    vector<muti_object> muti;		//wait to delete
+    muti_object mtmp;
     Point ptmp;
     Line ltmp;
     LineInput=fopen(argv[2],"r");
@@ -56,6 +65,7 @@ int main(int argc,char *argv[]){
 	LineOut=fopen(argv[4],"w");
 	AnsTest=fopen("anstest.txt","w");
 	PointTest=fopen("pointtest.txt","w");
+	LineTest=fopen("linetest.txt","w");
 	/*
 	read data from file
 	because the gml format is fixed, do not care what the text write
@@ -86,6 +96,7 @@ int main(int argc,char *argv[]){
 		ltmp.lipoint.push_back(ptmp);
 		ptmp.removable=1;
 
+		fprintf(LineTest,"%.7lf,%.7lf ",ptmp.x,ptmp.y);
 		while(fscanf(LineInput,"%s",input)!=EOF){	//other point in this line
 			if(input[0]=='<')	break;		//end of the point
 			ptmp.x=atof(input);
@@ -94,6 +105,7 @@ int main(int argc,char *argv[]){
 					ptmp.y=atof(input+i+1);
 					break;
 				}
+			fprintf(LineTest,"%.7lf,%.7lf ",ptmp.x,ptmp.y);
 			tmpx=((int)(ptmp.x/grid_size))*grid_size;	//calculate this point should be put
 			tmpy=((int)(ptmp.y/grid_size))*grid_size;	//into which grid
 			if(ptmp.x<0)	tmpx-=grid_size;
@@ -101,6 +113,7 @@ int main(int argc,char *argv[]){
 			grid[tmpx][tmpy].line_id[id]=1;
 			ltmp.lipoint.push_back(ptmp);
 		}
+		fprintf(LineTest,"\n");
 		ltmp.lipoint[ltmp.lipoint.size()-1].removable=0;
 		line.push_back(ltmp);	//put line to vector
 	}
@@ -196,6 +209,14 @@ int main(int argc,char *argv[]){
 			}
 			if(!no_other){	//do delete
 				if(start==j){	//if this grid have obstacle point or another line
+					if(muti.size()==0||
+						tmpx!=muti[muti.size()-1].pos_x || tmpy!=muti[muti.size()-1].pos_y){
+						mtmp.node=grid[tmpx][tmpy];
+						mtmp.line_num=grid[tmpx][tmpy].line_id.size();
+						mtmp.pos_x=tmpx;
+						mtmp.pos_y=tmpy;
+						muti.push_back(mtmp);
+					}
 					ptmp=line[i].lipoint[start];
 					ltmp.lipoint.push_back(ptmp);
 					start++;
@@ -230,7 +251,9 @@ int main(int argc,char *argv[]){
     	}//for(int j=0;j<line_point_size;j++)
     	ans.push_back(ltmp);
     }
-    printf("the num of remove point is %d\n",remove_num);
+    printf("%d\n",remove_num);
+    if(remove_num<PointToRemove){
+    }
     /*print ans */
     line_size=ans.size();
     for(int i=0;i<line_size;i++){
