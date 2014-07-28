@@ -1,9 +1,40 @@
 # Sigspactial 2014
 
+[http://mypages.iit.edu/~xzhang22/GISCUP2014/index.php](http://mypages.iit.edu/~xzhang22/GISCUP2014/index.php)
+
 ## Document
-install requirements.txt
+
+### C++ get answer
+
+Compile
+
+    g++ -o Simplify main.cpp
+
+Execute
+
+    ./Simplify < PointToRemove > < LineInputFilePath > < PointInputFilePath > < OutputFilePath >
+
+Execute example
+
+    #sample 01
+    ./Simplify 100 sample_01/lines_out.txt sample_01/points_out.txt answer.txt
+
+    #sample 02
+    ./Simplify 100 sample_02/lines_out.txt sample_02/points_out.txt answer.txt
+
+    #sample 03
+    ./Simplify 100 sample_03/lines_out.txt sample_03/points_out.txt answer.txt
+
+### Python draw picture
+First you have to install the python2.7 and pip
+
+install require package
 
     pip intall -r requirements.txt
+
+install require package (alternative)
+
+    sudo apt-get install python-matplotlib
 
 start drawing
 
