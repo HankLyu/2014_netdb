@@ -17,7 +17,7 @@ if __name__ == '__main__' :
             xArray.append(strTmp[0])
             yArray.append(strTmp[1])
 
-        plt.plot(xArray, yArray, "g--")
+        plt.plot(xArray, yArray)
 
     for string in open('pointtest.txt', 'r') :
         string = string.strip()
@@ -35,7 +35,7 @@ if __name__ == '__main__' :
             xArray.append(strTmp[0])
             yArray.append(strTmp[1])
 
-        plt.plot(xArray, yArray, "g--")
+        plt.plot(xArray, yArray)
 
     for string in open('pointtest.txt', 'r') :
         string = string.strip()
