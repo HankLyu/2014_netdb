@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__' :
     plt.subplot(211)
+    lineList = []
     for string in open('linetest.txt', 'r') :
         string = string.strip()
         string = string.split()
@@ -14,6 +15,7 @@ if __name__ == '__main__' :
         yArray = []
         for strTmp in string :
             strTmp = strTmp.split(',')
+            lineList.append(strTmp)
             xArray.append(strTmp[0])
             yArray.append(strTmp[1])
 
@@ -32,6 +34,10 @@ if __name__ == '__main__' :
         yArray = []
         for strTmp in string :
             strTmp = strTmp.split(',')
+            if strTmp in lineList :
+                pass
+            else :
+                print 'false in ' + strTmp
             xArray.append(strTmp[0])
             yArray.append(strTmp[1])
 
